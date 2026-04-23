@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!--
+  index.html — Standalone reference / dev preview
+  ================================================
+  The extension does NOT load this file directly — it builds the HTML
+  string in extension.ts and inlines CSS + JS.
+
+  This file is useful for:
+    • Designing the UI in a browser without running VS Code
+    • Quick iteration on styles and layout
+    • Sharing a standalone demo
+
+  To use it standalone, uncomment the <script> block at the bottom
+  that injects sample ALGO_STEPS data.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Algorithm Visualizer — Dev Preview</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ── Header ─────────────────────────────────────────────────── -->
+  <header class="header">
+    <h1 class="header__title">⚡ Bubble Sort Visualizer</h1>
+    <div class="header__meta">
+      <span id="stepCounter" class="badge">Step 0 / 0</span>
+      <span id="lineNumber" class="badge badge--line">Line —</span>
+    </div>
+  </header>
+
+  <!-- ── Array bars ──────────────────────────────────────────────── -->
+  <section class="viz-section">
+    <div id="arrayContainer" class="array-container" aria-label="Array visualization"></div>
+  </section>
+
+  <!-- ── Step info strip ─────────────────────────────────────────── -->
+  <div id="stepInfo" class="step-info">Initializing…</div>
+
+  <!-- ── Controls ────────────────────────────────────────────────── -->
+  <div class="controls">
+    <button id="btnPlay"  class="btn btn--primary">▶ Play</button>
+    <button id="btnPause" class="btn" disabled>⏸ Pause</button>
+    <button id="btnReset" class="btn">↺ Reset</button>
+    <label class="speed-label">
+      Speed
+      <input id="speedSlider" type="range" min="50" max="1000" value="500" step="50" />
+    </label>
+  </div>
+
+  <!-- ── Legend ──────────────────────────────────────────────────── -->
+  <div class="legend">
+    <span class="legend__item legend__item--compare">Comparing</span>
+    <span class="legend__item legend__item--swap">Swapping</span>
+    <span class="legend__item legend__item--normal">Unsorted</span>
+    <span class="legend__item legend__item--done">Sorted</span>
+  </div>
+
+  <!--
+    ── Standalone dev data injection ────────────────────────────────
+    Uncomment this block to preview the UI in a browser.
+    The extension replaces this with real steps from steps.json.
+  -->
+  <!--
+  <script>
+    window.ALGO_STEPS = [
+      {"type":"init",    "array":[64,34,25,12,22,11,90],"i":-1,"j":-1,"line":9},
+      {"type":"compare", "array":[64,34,25,12,22,11,90],"i":0, "j":1, "line":18},
+      {"type":"swap",    "array":[34,64,25,12,22,11,90],"i":0, "j":1, "line":20},
+      {"type":"compare", "array":[34,64,25,12,22,11,90],"i":1, "j":2, "line":18},
+      {"type":"swap",    "array":[34,25,64,12,22,11,90],"i":1, "j":2, "line":20},
+      {"type":"compare", "array":[34,25,64,12,22,11,90],"i":2, "j":3, "line":18},
+      {"type":"swap",    "array":[34,25,12,64,22,11,90],"i":2, "j":3, "line":20},
+      {"type":"compare", "array":[34,25,12,64,22,11,90],"i":3, "j":4, "line":18},
+      {"type":"swap",    "array":[34,25,12,22,64,11,90],"i":3, "j":4, "line":20},
+      {"type":"compare", "array":[34,25,12,22,64,11,90],"i":4, "j":5, "line":18},
+      {"type":"swap",    "array":[34,25,12,22,11,64,90],"i":4, "j":5, "line":20},
+      {"type":"compare", "array":[34,25,12,22,11,64,90],"i":5, "j":6, "line":18}
+    ];
+  </script>
+  -->
+
+  <script src="script.js"></script>
+</body>
+</html>

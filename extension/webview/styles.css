@@ -1,0 +1,265 @@
+/* styles.css — Algorithm Visualizer WebView
+   ==========================================
+   Dark, terminal-inspired aesthetic with a monospace feel.
+   Uses CSS custom properties so every colour is easy to tweak. */
+
+/* ── Reset & base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Palette */
+  --bg:          #0d1117;
+  --surface:     #161b22;
+  --border:      #30363d;
+  --text:        #c9d1d9;
+  --text-dim:    #8b949e;
+  --accent:      #58a6ff;
+  --accent-glow: rgba(88, 166, 255, 0.25);
+
+  /* Bar states */
+  --bar-normal:  #1f6feb;
+  --bar-compare: #f0883e;   /* orange — currently being compared */
+  --bar-swap:    #f85149;   /* red    — being swapped            */
+  --bar-done:    #3fb950;   /* green  — confirmed sorted         */
+
+  /* Typography */
+  --font-mono:  "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+  --font-ui:    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Spacing */
+  --gap: 1rem;
+  --radius: 6px;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* ── Layout ───────────────────────────────────────────────────────────────── */
+body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding: 1.25rem 1.5rem 1.5rem;
+  min-height: 100vh;
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.75rem;
+}
+
+.header__title {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+
+.header__meta {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ── Badges ───────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+.badge--line {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ── Visualization section ────────────────────────────────────────────────── */
+.viz-section {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem 1rem 0.5rem;
+  min-height: 240px;
+  position: relative;
+}
+
+.array-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Individual bar ───────────────────────────────────────────────────────── */
+.bar {
+  flex: 1;
+  max-width: 60px;
+  min-width: 18px;
+  border-radius: 4px 4px 0 0;
+  background: var(--bar-normal);
+  position: relative;
+  transition: height 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.15s ease;
+  cursor: default;
+}
+
+/* Value label inside the bar */
+.bar::after {
+  content: attr(data-value);
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+/* Index label below the bar */
+.bar::before {
+  content: attr(data-index);
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+/* ── Bar state colours ────────────────────────────────────────────────────── */
+.bar.compare { background: var(--bar-compare); }
+.bar.swap    { background: var(--bar-swap);    }
+.bar.done    { background: var(--bar-done);    }
+
+/* Pulse animation on swap */
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.6); }
+  70%  { box-shadow: 0 0 0 10px rgba(248, 81, 73, 0);  }
+  100% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0);     }
+}
+.bar.swap { animation: pulse 0.4s ease; }
+
+/* ── Step info strip ──────────────────────────────────────────────────────── */
+.step-info {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.4rem 1rem;
+}
+
+/* ── Controls ─────────────────────────────────────────────────────────────── */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--border);
+  border-color: var(--accent);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0d1117;
+  font-weight: 600;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: #79b8ff;
+  border-color: #79b8ff;
+}
+
+.speed-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+
+#speedSlider {
+  width: 90px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* ── Legend ───────────────────────────────────────────────────────────────── */
+.legend {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+.legend__item::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legend__item--compare::before { background: var(--bar-compare); }
+.legend__item--swap::before    { background: var(--bar-swap);    }
+.legend__item--normal::before  { background: var(--bar-normal);  }
+.legend__item--done::before    { background: var(--bar-done);    }
