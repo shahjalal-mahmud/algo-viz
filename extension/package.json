@@ -1,15 +1,10 @@
 {
   "name": "algo-visualizer",
   "displayName": "Algorithm Visualizer",
-  "description": "Run → See → Understand: Visualize algorithms step-by-step inside VS Code",
-  "version": "0.1.0",
-  "engines": {
-    "vscode": "^1.85.0"
-  },
-  "categories": [
-    "Education",
-    "Visualization"
-  ],
+  "description": "Run -> See -> Understand: Visualize algorithms step-by-step inside VS Code",
+  "version": "0.3.0",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Education", "Visualization"],
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
@@ -29,6 +24,34 @@
           "group": "navigation"
         }
       ]
+    },
+    "configuration": {
+      "title": "Algorithm Visualizer",
+      "properties": {
+        "algoViz.aiApiKey": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "API key for AI analysis. Get a free key at [DeepSeek Platform](https://platform.deepseek.com) or [OpenRouter](https://openrouter.ai). **Never commit this value** — keep it in user settings, not workspace settings.",
+          "scope": "application"
+        },
+        "algoViz.aiProvider": {
+          "type": "string",
+          "enum": ["deepseek", "openrouter"],
+          "enumDescriptions": [
+            "DeepSeek API (api.deepseek.com) — recommended, very affordable",
+            "OpenRouter (openrouter.ai) — routes to many models, has free tier"
+          ],
+          "default": "deepseek",
+          "description": "Which AI provider to use for algorithm analysis.",
+          "scope": "window"
+        },
+        "algoViz.aiModel": {
+          "type": "string",
+          "default": "",
+          "description": "Model override. Leave empty to use the provider default (deepseek-chat / deepseek/deepseek-chat).",
+          "scope": "window"
+        }
+      }
     }
   },
   "scripts": {
@@ -39,7 +62,7 @@
     "lint": "eslint src --ext ts"
   },
   "devDependencies": {
-    "@types/node": "^20.19.39",
+    "@types/node": "^20.0.0",
     "@types/vscode": "^1.85.0",
     "typescript": "^5.3.0"
   }

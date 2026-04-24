@@ -1,19 +1,19 @@
 /**
- * script.js — Algorithm Visualizer WebView Controller
- * =====================================================
- * Reads window.ALGO_STEPS (injected by the extension) and drives the
- * bar chart animation step-by-step.
- *
- * State machine:
- *   idle -> playing -> paused -> idle (reset)
- *
- * Each "step" from Python looks like:
- *   { type: "init"|"compare"|"swap", array: [...], i: N, j: N, line: N }
+ * script.js — Algorithm Visualizer WebView (v3)
+ * ===============================================
+ * Sections:
+ *   A. Original animation system     (unchanged from v1)
+ *   B. Performance graph             (updated: normalized curve toggle)
+ *   C. Complexity estimation         (updated: richer display)
+ *   D. AI panel message listener     (new in v3)
  */
 
 "use strict";
 
-// ── DOM references ──────────────────────────────────────────────────────────
+// =============================================================================
+// A. ORIGINAL ANIMATION SYSTEM — untouched
+// =============================================================================
+
 const arrayContainer = document.getElementById("arrayContainer");
 const stepCounter    = document.getElementById("stepCounter");
 const lineNumber     = document.getElementById("lineNumber");
@@ -23,68 +23,40 @@ const btnPause       = document.getElementById("btnPause");
 const btnReset       = document.getElementById("btnReset");
 const speedSlider    = document.getElementById("speedSlider");
 
-// ── Data (injected by extension.ts) ────────────────────────────────────────
-const steps = window.ALGO_STEPS || [];
+const steps    = window.ALGO_STEPS || [];
+const perfData = window.PERF_DATA  || [];
 
-// ── Player state ────────────────────────────────────────────────────────────
 let currentStep = 0;
 let isPlaying   = false;
 let timerId     = null;
-
-// Track which indices are "done" (confirmed sorted) so we can keep them green
 const doneIndices = new Set();
 
-// ── Derived: max value for scaling bar heights ──────────────────────────────
-const maxValue = steps.length > 0
-  ? Math.max(...steps[0].array)
-  : 1;
+const maxValue = steps.length > 0 ? Math.max(...steps[0].array) : 1;
 
-// ── Initialise ──────────────────────────────────────────────────────────────
 if (steps.length === 0) {
   stepInfo.textContent = "No steps found. Run your Python file first.";
 } else {
-  renderStep(0);            // draw the initial frame immediately
+  renderStep(0);
   updateCounterDisplay();
 }
 
-// ── Button handlers ─────────────────────────────────────────────────────────
-
 btnPlay.addEventListener("click", () => {
-  if (currentStep >= steps.length - 1) {
-    // Auto-reset if we're at the end
-    resetPlayer();
-  }
+  if (currentStep >= steps.length - 1) resetPlayer();
   startPlaying();
 });
-
 btnPause.addEventListener("click", pausePlaying);
+btnReset.addEventListener("click", () => { pausePlaying(); resetPlayer(); });
 
-btnReset.addEventListener("click", () => {
-  pausePlaying();
-  resetPlayer();
-});
-
-// Speed slider: higher value = slower (we map it so slider right = faster)
 speedSlider.addEventListener("input", () => {
-  if (isPlaying) {
-    // Restart the interval with the new speed
-    pausePlaying();
-    startPlaying();
-  }
+  if (isPlaying) { pausePlaying(); startPlaying(); }
 });
-
-// ── Player controls ─────────────────────────────────────────────────────────
 
 function startPlaying() {
   if (isPlaying) return;
   isPlaying = true;
-
   btnPlay.disabled  = true;
   btnPause.disabled = false;
-
-  // Calculate delay: slider goes 50-1000ms; we invert so right = fast
   const delay = 1050 - parseInt(speedSlider.value, 10);
-
   timerId = setInterval(() => {
     if (currentStep >= steps.length - 1) {
       pausePlaying();
@@ -102,7 +74,6 @@ function pausePlaying() {
   isPlaying = false;
   clearInterval(timerId);
   timerId = null;
-
   btnPlay.disabled  = false;
   btnPause.disabled = true;
 }
@@ -116,13 +87,11 @@ function resetPlayer() {
   btnPause.disabled = true;
 }
 
-// ── Rendering ────────────────────────────────────────────────────────────────
-
 function renderStep(index) {
   const step = steps[index];
   if (!step) return;
 
-  stepInfo.textContent = describeStep(step);
+  stepInfo.textContent   = describeStep(step);
   lineNumber.textContent = step.line > 0 ? `Line ${step.line}` : "Line --";
 
   if (step.type === "done") {
@@ -130,29 +99,21 @@ function renderStep(index) {
   }
 
   arrayContainer.innerHTML = "";
-
   step.array.forEach((value, i) => {
     const bar = document.createElement("div");
     bar.className = "bar";
     bar.setAttribute("data-value", value);
     bar.setAttribute("data-index", i);
+    bar.style.height = `${(value / maxValue) * 85}%`;
 
-    const heightPercent = (value / maxValue) * 85;
-    bar.style.height = `${heightPercent}%`;
-
-    if (doneIndices.has(i)) {
-      bar.classList.add("done");
-    } else if (step.type === "swap" && (i === step.i || i === step.j)) {
-      bar.classList.add("swap");
-    } else if (step.type === "compare" && (i === step.i || i === step.j)) {
-      bar.classList.add("compare");
-    }
+    if (doneIndices.has(i))                                    bar.classList.add("done");
+    else if (step.type === "swap"    && (i===step.i||i===step.j)) bar.classList.add("swap");
+    else if (step.type === "compare" && (i===step.i||i===step.j)) bar.classList.add("compare");
 
     if (index === steps.length - 1) {
       bar.classList.remove("swap", "compare");
       bar.classList.add("done");
     }
-
     arrayContainer.appendChild(bar);
   });
 }
@@ -163,8 +124,7 @@ function updateCounterDisplay() {
 
 function markSortComplete() {
   stepInfo.textContent = "Sorting complete! All elements are in place.";
-  const bars = arrayContainer.querySelectorAll(".bar");
-  bars.forEach(bar => {
+  arrayContainer.querySelectorAll(".bar").forEach(bar => {
     bar.classList.remove("swap", "compare");
     bar.classList.add("done");
   });
@@ -172,303 +132,378 @@ function markSortComplete() {
 
 function describeStep(step) {
   switch (step.type) {
-    case "init":
-      return `Initial array: [${step.array.join(", ")}]`;
-    case "compare":
-      return `Comparing arr[${step.i}]=${step.array[step.i]} with arr[${step.j}]=${step.array[step.j]}`;
-    case "swap":
-      return `Swapping arr[${step.i}]=${step.array[step.i]} with arr[${step.j}]=${step.array[step.j]}`;
-    default:
-      return `Step type: ${step.type}`;
+    case "init":    return `Initial array: [${step.array.join(", ")}]`;
+    case "compare": return `Comparing arr[${step.i}]=${step.array[step.i]} with arr[${step.j}]=${step.array[step.j]}`;
+    case "swap":    return `Swapping arr[${step.i}]=${step.array[step.i]} with arr[${step.j}]=${step.array[step.j]}`;
+    default:        return `Step type: ${step.type}`;
   }
 }
 
 
 // =============================================================================
-// NEW CODE BELOW — Performance graph, complexity estimation, AI explanation
-// Everything above this line is unchanged from the original script.js
+// B. PERFORMANCE GRAPH — updated with normalized curve toggle
 // =============================================================================
 
-// ── Performance data (injected alongside ALGO_STEPS) ─────────────────────────
-const perfData = window.PERF_DATA || [];
+// Colour palette for the four curves
+const CURVE_COLORS = {
+  raw:    "#58a6ff",   // blue  — raw time vs n (always shown)
+  n:      "#f0883e",   // orange — t/n
+  nlogn:  "#d2a8ff",   // purple — t/(n log n)
+  n2:     "#3fb950",   // green  — t/n²
+};
 
-// Run all new features once the page has loaded
+const canvas     = document.getElementById("perfChart");
+const emptyMsg   = document.getElementById("graphEmpty");
+const normToggle = document.getElementById("normToggle");
+
+// Initial draw
 initPerformancePanel();
 
-// -----------------------------------------------------------------------------
-// FEATURE 1 + 2: Draw the performance graph + detect complexity
-// -----------------------------------------------------------------------------
+// Redraw when the user toggles normalized curves
+normToggle.addEventListener("change", () => drawGraph(canvas, perfData, normToggle.checked));
 
 function initPerformancePanel() {
-  const canvas   = document.getElementById("perfChart");
-  const emptyMsg = document.getElementById("graphEmpty");
-
   if (!perfData || perfData.length === 0) {
-    // No data — show the empty-state message, hide the canvas
-    canvas.style.display  = "none";
-    emptyMsg.style.display = "block";
+    canvas.style.display    = "none";
+    emptyMsg.style.display  = "block";
     document.getElementById("complexityBadge").textContent = "No data";
     return;
   }
 
-  // Hide the empty-state message, show the canvas
   emptyMsg.style.display = "none";
   canvas.style.display   = "block";
 
-  drawGraph(canvas, perfData);
-  const complexity = estimateComplexity(perfData);
-  showComplexity(complexity);
+  drawGraph(canvas, perfData, false);
+
+  const result = estimateComplexity(perfData);
+  showComplexity(result);
+  showGraphExplanation(result, perfData);
 }
 
 /**
- * Draw a clean line + dot chart on a <canvas> element.
- * Pure vanilla JS — no libraries.
+ * Draw the performance chart.
+ *
+ * @param {HTMLCanvasElement} canvas
+ * @param {object[]}          data        - array of PerfPoint objects
+ * @param {boolean}           showNormed  - whether to overlay normalized curves
  */
-function drawGraph(canvas, data) {
-  // Make canvas crisp on high-DPI screens
-  const W      = canvas.offsetWidth  || 560;
-  const H      = canvas.offsetHeight || 200;
-  const ratio  = window.devicePixelRatio || 1;
+function drawGraph(canvas, data, showNormed) {
+  const W     = canvas.offsetWidth  || 560;
+  const H     = canvas.offsetHeight || 200;
+  const ratio = window.devicePixelRatio || 1;
   canvas.width  = W * ratio;
   canvas.height = H * ratio;
 
   const ctx = canvas.getContext("2d");
   ctx.scale(ratio, ratio);
 
-  // Padding inside the canvas for axes
-  const pad = { top: 20, right: 20, bottom: 44, left: 60 };
+  const pad   = { top: 20, right: showNormed ? 120 : 20, bottom: 44, left: 60 };
   const plotW = W - pad.left - pad.right;
   const plotH = H - pad.top  - pad.bottom;
 
-  // Data range
-  const maxN    = Math.max(...data.map(d => d.n));
-  const maxTime = Math.max(...data.map(d => d.time));
-
-  // Helper: map data values to canvas pixel coordinates
-  const toX = n    => pad.left + (n    / maxN)    * plotW;
-  const toY = time => pad.top  + plotH - (time / maxTime) * plotH;
-
-  // ── Background (match VS Code dark theme) ──────────────────────────────
+  // ── Background ────────────────────────────────────────────────────────────
   ctx.fillStyle = "#161b22";
   ctx.fillRect(0, 0, W, H);
 
-  // ── Grid lines ──────────────────────────────────────────────────────────
+  // ── Grid ──────────────────────────────────────────────────────────────────
+  const maxN    = Math.max(...data.map(d => d.n));
+  const maxTime = Math.max(...data.map(d => d.time));
+
+  const toX = n    => pad.left + (n    / maxN)    * plotW;
+  const toY = (v, maxV) => pad.top + plotH - (v / maxV) * plotH;
+
   ctx.strokeStyle = "#30363d";
   ctx.lineWidth   = 1;
 
-  // Horizontal grid (5 lines)
   for (let i = 0; i <= 4; i++) {
-    const y = pad.top + (i / 4) * plotH;
-    ctx.beginPath();
-    ctx.moveTo(pad.left, y);
-    ctx.lineTo(pad.left + plotW, y);
-    ctx.stroke();
-
-    // Y-axis labels (time in ms)
+    const y   = pad.top + (i / 4) * plotH;
     const val = maxTime * (1 - i / 4);
-    ctx.fillStyle   = "#8b949e";
-    ctx.font        = "11px monospace";
-    ctx.textAlign   = "right";
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + plotW, y); ctx.stroke();
+    ctx.fillStyle = "#8b949e"; ctx.font = "11px monospace"; ctx.textAlign = "right";
     ctx.fillText(formatTime(val), pad.left - 6, y + 4);
   }
 
-  // Vertical grid (one per data point)
   data.forEach(d => {
     const x = toX(d.n);
     ctx.strokeStyle = "#30363d";
-    ctx.beginPath();
-    ctx.moveTo(x, pad.top);
-    ctx.lineTo(x, pad.top + plotH);
-    ctx.stroke();
-
-    // X-axis labels
-    ctx.fillStyle = "#8b949e";
-    ctx.font      = "11px monospace";
-    ctx.textAlign = "center";
+    ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + plotH); ctx.stroke();
+    ctx.fillStyle = "#8b949e"; ctx.font = "11px monospace"; ctx.textAlign = "center";
     ctx.fillText(`n=${d.n}`, x, pad.top + plotH + 18);
   });
 
-  // ── Axis labels ─────────────────────────────────────────────────────────
-  ctx.fillStyle = "#8b949e";
-  ctx.font      = "12px monospace";
-  ctx.textAlign = "center";
+  // Axis titles
+  ctx.fillStyle = "#8b949e"; ctx.font = "12px monospace"; ctx.textAlign = "center";
   ctx.fillText("Input size (n)", pad.left + plotW / 2, H - 4);
-
-  // Rotated Y-axis label
   ctx.save();
   ctx.translate(12, pad.top + plotH / 2);
   ctx.rotate(-Math.PI / 2);
   ctx.fillText("Time", 0, 0);
   ctx.restore();
 
-  // ── Data line ────────────────────────────────────────────────────────────
-  ctx.strokeStyle = "#58a6ff";
-  ctx.lineWidth   = 2;
-  ctx.lineJoin    = "round";
-  ctx.beginPath();
-  data.forEach((d, idx) => {
-    const x = toX(d.n);
-    const y = toY(d.time);
-    idx === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-  });
-  ctx.stroke();
+  // ── Helper: draw one polyline ─────────────────────────────────────────────
+  function drawLine(points, color, maxV, dashed = false) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth   = dashed ? 1.5 : 2;
+    ctx.lineJoin    = "round";
+    if (dashed) ctx.setLineDash([5, 4]);
+    ctx.beginPath();
+    points.forEach(([n, v], idx) => {
+      const x = toX(n);
+      const y = toY(v, maxV);
+      idx === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    ctx.restore();
+  }
 
-  // ── Shaded area under the line ───────────────────────────────────────────
-  ctx.save();
-  const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + plotH);
-  grad.addColorStop(0,   "rgba(88, 166, 255, 0.25)");
-  grad.addColorStop(1,   "rgba(88, 166, 255, 0.00)");
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.moveTo(toX(data[0].n), pad.top + plotH);
-  data.forEach(d => ctx.lineTo(toX(d.n), toY(d.time)));
-  ctx.lineTo(toX(data[data.length - 1].n), pad.top + plotH);
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
+  // ── Helper: filled area under one line ───────────────────────────────────
+  function drawArea(points, color, maxV) {
+    ctx.save();
+    const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + plotH);
+    grad.addColorStop(0, color.replace(")", ", 0.20)").replace("rgb", "rgba"));
+    grad.addColorStop(1, color.replace(")", ", 0.00)").replace("rgb", "rgba"));
+    ctx.fillStyle = "rgba(88,166,255,0.15)";
+    ctx.beginPath();
+    ctx.moveTo(toX(points[0][0]), pad.top + plotH);
+    points.forEach(([n, v]) => ctx.lineTo(toX(n), toY(v, maxV)));
+    ctx.lineTo(toX(points[points.length - 1][0]), pad.top + plotH);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
 
-  // ── Data point dots ──────────────────────────────────────────────────────
+  // ── Raw time curve (always shown) ────────────────────────────────────────
+  const rawPoints = data.map(d => [d.n, d.time]);
+  drawArea(rawPoints, CURVE_COLORS.raw, maxTime);
+  drawLine(rawPoints, CURVE_COLORS.raw, maxTime);
+
+  // ── Normalized curves (only when toggle is on) ────────────────────────────
+  if (showNormed) {
+    const norm = (key, maxV) => data.map(d => [d.n, d[key]]);
+
+    const maxN_norm    = Math.max(...data.map(d => d.n_norm));
+    const maxNlogn_norm = Math.max(...data.map(d => d.nlogn_norm));
+    const maxN2_norm   = Math.max(...data.map(d => d.n2_norm));
+
+    drawLine(norm("n_norm"),    CURVE_COLORS.n,     maxN_norm,    true);
+    drawLine(norm("nlogn_norm"), CURVE_COLORS.nlogn, maxNlogn_norm, true);
+    drawLine(norm("n2_norm"),   CURVE_COLORS.n2,    maxN2_norm,   true);
+
+    // ── Legend ─────────────────────────────────────────────────────────────
+    const legendX = pad.left + plotW + 8;
+    const items = [
+      { color: CURVE_COLORS.raw,   label: "raw time" },
+      { color: CURVE_COLORS.n,     label: "t / n" },
+      { color: CURVE_COLORS.nlogn, label: "t / n\u00B7logn" },
+      { color: CURVE_COLORS.n2,    label: "t / n\u00B2" },
+    ];
+    items.forEach(({ color, label }, i) => {
+      const ly = pad.top + 16 + i * 22;
+      ctx.fillStyle = color;
+      ctx.fillRect(legendX, ly - 6, 14, 3);
+      ctx.fillStyle = "#8b949e";
+      ctx.font      = "10px monospace";
+      ctx.textAlign = "left";
+      ctx.fillText(label, legendX + 18, ly);
+    });
+  }
+
+  // ── Dots over raw line ────────────────────────────────────────────────────
   data.forEach(d => {
     const x = toX(d.n);
-    const y = toY(d.time);
-
-    // Outer glow ring
-    ctx.beginPath();
-    ctx.arc(x, y, 5, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(88, 166, 255, 0.3)";
-    ctx.fill();
-
-    // Solid dot
-    ctx.beginPath();
-    ctx.arc(x, y, 3, 0, Math.PI * 2);
-    ctx.fillStyle = "#58a6ff";
-    ctx.fill();
+    const y = toY(d.time, maxTime);
+    ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(88,166,255,0.3)"; ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = CURVE_COLORS.raw; ctx.fill();
   });
 }
 
-/** Format a time value into a human-readable string (auto-pick ms or s). */
-function formatTime(seconds) {
-  if (seconds < 0.001) return `${(seconds * 1000000).toFixed(0)}us`;
-  if (seconds < 1)     return `${(seconds * 1000).toFixed(2)}ms`;
-  return `${seconds.toFixed(2)}s`;
+function formatTime(s) {
+  if (s < 0.001) return `${(s * 1e6).toFixed(0)}us`;
+  if (s < 1)     return `${(s * 1000).toFixed(2)}ms`;
+  return `${s.toFixed(2)}s`;
 }
 
-// -----------------------------------------------------------------------------
-// FEATURE 3: Complexity estimation — no AI, pure math
-// -----------------------------------------------------------------------------
+
+// =============================================================================
+// C. COMPLEXITY ESTIMATION — improved display
+// =============================================================================
 
 /**
- * For each candidate complexity class, compute ratio = time / f(n).
- * If the algorithm truly IS that complexity, the ratio should be roughly
- * constant across all input sizes. We pick the class with the lowest
- * coefficient of variation (std-dev / mean) — i.e. the most constant ratio.
+ * Coefficient-of-variation test: pick the complexity whose normalized ratio
+ * is most constant (lowest CV = std-dev / mean) across all input sizes.
  */
 function estimateComplexity(data) {
-  // We need at least 3 points to make a meaningful comparison
-  if (data.length < 3) return { label: "O(n²)", confidence: "low" };
+  if (data.length < 3) return { label: "O(n\u00B2)", confidence: "low", cvWinner: 99 };
+
+  const cv = ratios => {
+    const mean     = ratios.reduce((a, b) => a + b, 0) / ratios.length;
+    const variance = ratios.reduce((s, r) => s + (r - mean) ** 2, 0) / ratios.length;
+    return Math.sqrt(variance) / mean;
+  };
 
   const candidates = [
-    {
-      label: "O(n)",
-      fn: n => n,
-    },
-    {
-      label: "O(n log n)",
-      fn: n => n * Math.log2(n),
-    },
-    {
-      label: "O(n²)",
-      fn: n => n * n,
-    },
+    { label: "O(n)",       key: "n_norm"    },
+    { label: "O(n log n)", key: "nlogn_norm" },
+    { label: "O(n\u00B2)", key: "n2_norm"   },
   ];
 
-  let bestLabel = "O(n²)";
-  let bestCV    = Infinity;
-
-  candidates.forEach(candidate => {
-    // Compute ratio time / f(n) for each data point
-    const ratios = data.map(d => d.time / candidate.fn(d.n));
-
-    const mean  = ratios.reduce((a, b) => a + b, 0) / ratios.length;
-    const variance = ratios.reduce((s, r) => s + (r - mean) ** 2, 0) / ratios.length;
-    const stdDev = Math.sqrt(variance);
-    const cv = stdDev / mean;   // coefficient of variation — lower = more constant
-
-    if (cv < bestCV) {
-      bestCV    = cv;
-      bestLabel = candidate.label;
-    }
+  let best = { label: "O(n\u00B2)", cvWinner: Infinity };
+  candidates.forEach(c => {
+    const score = cv(data.map(d => d[c.key]));
+    if (score < best.cvWinner) best = { label: c.label, cvWinner: score };
   });
 
-  // Confidence: how cleanly does the winner beat the others?
-  const confidence = bestCV < 0.15 ? "high" : bestCV < 0.35 ? "medium" : "low";
-  return { label: bestLabel, confidence };
+  const confidence = best.cvWinner < 0.10 ? "high"
+                   : best.cvWinner < 0.30 ? "medium"
+                   :                        "low";
+  return { ...best, confidence };
 }
 
-function showComplexity(result) {
+function showComplexity({ label, confidence }) {
   const badge = document.getElementById("complexityBadge");
   const note  = document.getElementById("complexityNote");
 
-  badge.textContent = result.label;
+  // v3: add "(empirical)" suffix
+  badge.textContent = label;
+  note.textContent  = `(empirical, ${confidence} confidence)`;
 
-  // Colour the badge based on detected complexity
   badge.className = "complexity-badge";
-  if      (result.label === "O(n)")       badge.classList.add("complexity-badge--green");
-  else if (result.label === "O(n log n)") badge.classList.add("complexity-badge--yellow");
-  else                                     badge.classList.add("complexity-badge--red");
-
-  note.textContent = `(${result.confidence} confidence)`;
+  if      (label === "O(n)")       badge.classList.add("complexity-badge--green");
+  else if (label === "O(n log n)") badge.classList.add("complexity-badge--yellow");
+  else                              badge.classList.add("complexity-badge--red");
 }
 
-// -----------------------------------------------------------------------------
-// FEATURE 4: Rule-based AI explanation — no external API
-// -----------------------------------------------------------------------------
+/**
+ * Write one sentence of interpretation below the graph explaining
+ * WHICH normalized curve was flattest and WHY that matters.
+ */
+function showGraphExplanation({ label, confidence }, data) {
+  const el = document.getElementById("graphExplanation");
+  if (!el) return;
 
-const aiToggle = document.getElementById("aiToggle");
-const aiBox    = document.getElementById("aiBox");
-const aiText   = document.getElementById("aiText");
+  const curveNames = {
+    "O(n)":       "n-normalized (t/n)",
+    "O(n log n)": "n\u00B7log(n)-normalized (t/n\u00B7logn)",
+    "O(n\u00B2)": "n\u00B2-normalized (t/n\u00B2)",
+  };
 
-aiToggle.addEventListener("change", () => {
-  if (aiToggle.checked) {
-    aiBox.hidden = false;
-    // Generate explanation lazily — only when the user asks for it
-    aiText.textContent = generateExplanation(perfData);
-  } else {
-    aiBox.hidden = true;
+  const flatCurve = curveNames[label] ?? label;
+
+  // Compute growth factor between smallest and largest n
+  const first = data[0];
+  const last  = data[data.length - 1];
+  const nMult = (last.n / first.n).toFixed(0);
+  const tMult = (last.time / first.time).toFixed(1);
+
+  el.textContent =
+    `The ${flatCurve} curve is the most stable across all input sizes, ` +
+    `indicating ${label} growth (${confidence} confidence). ` +
+    `When n grew ${nMult}x (${first.n} \u2192 ${last.n}), ` +
+    `runtime grew ${tMult}x \u2014 consistent with ${label}. ` +
+    `Enable "Show normalized curves" to see all three ratios overlaid.`;
+}
+
+
+// =============================================================================
+// D. AI PANEL — message listener (new in v3)
+// =============================================================================
+
+// The extension sends one of two message types:
+//   { type: "ai_result", text: "..." }  — the AI response arrived
+//   { type: "ai_no_key" }               — no API key is configured
+
+window.addEventListener("message", event => {
+  const msg = event.data;
+  switch (msg.type) {
+    case "ai_result":
+      renderAiResult(msg.text);
+      break;
+    case "ai_no_key":
+      renderAiNoKey();
+      break;
+    default:
+      break;
   }
 });
 
 /**
- * Rule-based explanation generator.
- * Looks at the performance data and produces a human-readable paragraph.
- * No AI API — deterministic logic, always free.
+ * Parse the AI response into three labeled sections and render each
+ * in its own styled block.
+ *
+ * The AI is prompted to use exactly these labels:
+ *   EXPLANATION, COMPLEXITY, OPTIMIZATIONS
  */
-function generateExplanation(data) {
-  if (!data || data.length === 0) {
-    return "No performance data available. Run benchmark.py to enable this analysis.";
+function renderAiResult(text) {
+  document.getElementById("aiLoading").hidden = true;
+  document.getElementById("aiResult").hidden  = false;
+
+  const sections = parseSections(text);
+
+  renderAiSection("aiExplanation",   "Explanation",      sections.EXPLANATION);
+  renderAiSection("aiComplexity",    "Complexity",       sections.COMPLEXITY);
+  renderAiSection("aiOptimizations", "Optimizations",    sections.OPTIMIZATIONS);
+}
+
+/**
+ * Split the AI plain-text response into labelled sections.
+ * The model is asked to use "LABEL\ntext..." so we split on known headers.
+ */
+function parseSections(text) {
+  const headers = ["EXPLANATION", "COMPLEXITY", "OPTIMIZATIONS"];
+  const result  = {};
+  let current   = null;
+  let buffer    = [];
+
+  text.split("\n").forEach(line => {
+    const trimmed = line.trim().toUpperCase();
+    if (headers.includes(trimmed)) {
+      if (current) result[current] = buffer.join("\n").trim();
+      current = trimmed;
+      buffer  = [];
+    } else {
+      buffer.push(line);
+    }
+  });
+  if (current) result[current] = buffer.join("\n").trim();
+
+  // Fallback: if the model didn't use the expected headers, show everything
+  // under Explanation so the user still sees the response.
+  if (Object.keys(result).length === 0) {
+    result["EXPLANATION"] = text.trim();
   }
 
-  const complexity = estimateComplexity(data);
+  return result;
+}
 
-  // Compute how much time grew when n doubled (last two points)
-  const last  = data[data.length - 1];
-  const prev  = data[data.length - 2];
-  const nRatio = last.n    / prev.n;
-  const tRatio = last.time / prev.time;
-  const growthDesc = tRatio.toFixed(1) + "x";
+function renderAiSection(elementId, title, content) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
 
-  // Count swaps in the recorded steps
-  const swapCount    = steps.filter(s => s.type === "swap").length;
-  const compareCount = steps.filter(s => s.type === "compare").length;
+  if (!content) {
+    el.hidden = true;
+    return;
+  }
 
-  return [
-    `Bubble Sort works by repeatedly comparing neighbouring elements and swapping them if they are in the wrong order.`,
-    `Each full pass through the array guarantees that the largest unsorted element moves to its correct position at the end.`,
-    `\nFor the visualized array of ${steps[0]?.array.length ?? "?"} elements, the algorithm performed ${compareCount} comparisons and ${swapCount} swaps.`,
-    `\nThe benchmark shows that when input size grew from n=${prev.n} to n=${last.n} (${nRatio.toFixed(1)}x larger), the runtime grew by ${growthDesc}.`,
-    complexity.label === "O(n²)"
-      ? `This ~${tRatio.toFixed(0)}x growth for a ${nRatio.toFixed(0)}x increase in size is consistent with O(n\u00B2) — quadratic — behaviour: doubling n roughly quadruples the work.`
-      : `The estimated complexity is ${complexity.label}, which means runtime grows ${complexity.label} relative to input size.`,
-    `\nBubble Sort is rarely used in production because O(n\u00B2) algorithms become very slow for large inputs. Faster alternatives like Merge Sort or Quick Sort run in O(n log n).`,
-  ].join(" ");
+  el.hidden   = false;
+  el.innerHTML =
+    `<div class="ai-section-title">${title}</div>` +
+    `<p class="ai-section-body">${escapeHtml(content).replace(/\n/g, "<br>")}</p>`;
+}
+
+function renderAiNoKey() {
+  document.getElementById("aiLoading").hidden = true;
+  document.getElementById("aiNoKey").hidden   = false;
+}
+
+/** Prevent XSS — escape any HTML in the AI response before inserting it. */
+function escapeHtml(str) {
+  return str
+    .replace(/&/g,  "&amp;")
+    .replace(/</g,  "&lt;")
+    .replace(/>/g,  "&gt;")
+    .replace(/"/g,  "&quot;")
+    .replace(/'/g,  "&#039;");
 }
