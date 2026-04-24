@@ -138,4 +138,4 @@ We prioritize features that: (1) help the most learners, (2) align with the "Run
 
 ---
 
-*Last updated: June 2025 · For full version history, see [CHANGELOG.md](CHANGELOG.md)*
+*Last updated: April 2026 · For full version history, see [CHANGELOG.md](CHANGELOG.md)*
