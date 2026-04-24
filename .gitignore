@@ -1,5 +1,13 @@
 node_modules/
 dist/
 out/
+*.vsix
+*.log
+.env
+.env.local
+__pycache__/
+*.pyc
+steps.json
+performance.json
 .vscode/
 .DS_Store
