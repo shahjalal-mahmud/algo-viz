@@ -4,9 +4,10 @@
  * Entry point. Registers the "Visualize Algorithm" command which:
  *   1. Finds the currently open Python file
  *   2. Runs it with Python so viz.py writes steps.json
- *   3. Reads steps.json
- *   4. Opens a WebView panel in a split editor
- *   5. Sends the step data into the WebView for animation
+ *   3. ALSO runs benchmark.py so it writes performance.json   ← NEW
+ *   4. Reads steps.json + performance.json                    ← NEW
+ *   5. Opens a WebView panel in a split editor
+ *   6. Sends both datasets to WebView for animation + graph   ← NEW
  */
 
 import * as vscode from "vscode";
@@ -51,25 +52,46 @@ async function runVisualizer(context: vscode.ExtensionContext): Promise<void> {
     return;
   }
 
-  // Save the file so we always run the latest version
   await doc.save();
 
   const pythonFilePath = doc.uri.fsPath;
-  const pythonDir = path.dirname(pythonFilePath);
-  const stepsFilePath = path.join(pythonDir, "steps.json");
+  const pythonDir      = path.dirname(pythonFilePath);
+  const stepsFilePath  = path.join(pythonDir, "steps.json");
 
-  // ── 2. Run the Python file ───────────────────────────────────────────────
-  vscode.window.showInformationMessage("AlgoViz: Running algorithm…");
+  // ── NEW: benchmark.py lives in the same folder as the user's Python file ─
+  const benchmarkPath  = path.join(pythonDir, "benchmark.py");
+  const perfFilePath   = path.join(pythonDir, "performance.json");
 
+  // ── 2. Run the user's algorithm file ────────────────────────────────────
+  vscode.window.showInformationMessage("AlgoViz: Running algorithm...");
   try {
     await runPython(pythonFilePath, pythonDir);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    vscode.window.showErrorMessage(`AlgoViz: Python error — ${msg}`);
+    vscode.window.showErrorMessage(`AlgoViz: Python error -- ${msg}`);
     return;
   }
 
-  // ── 3. Read steps.json ───────────────────────────────────────────────────
+  // ── 3. NEW: Run benchmark.py (non-fatal if missing) ─────────────────────
+  let perfData: PerfPoint[] = [];
+  if (fs.existsSync(benchmarkPath)) {
+    vscode.window.showInformationMessage("AlgoViz: Running benchmark...");
+    try {
+      await runPython(benchmarkPath, pythonDir);
+      if (fs.existsSync(perfFilePath)) {
+        const raw = fs.readFileSync(perfFilePath, "utf-8");
+        perfData = JSON.parse(raw) as PerfPoint[];
+      }
+    } catch (err: unknown) {
+      // Benchmark failure is non-fatal — animation still works without it
+      console.warn("[AlgoViz] benchmark.py failed:", err);
+      vscode.window.showWarningMessage(
+        "AlgoViz: Benchmark failed. Animation will still work."
+      );
+    }
+  }
+
+  // ── 4. Read steps.json ───────────────────────────────────────────────────
   if (!fs.existsSync(stepsFilePath)) {
     vscode.window.showErrorMessage(
       "AlgoViz: steps.json not found. Make sure your script calls viz.save()."
@@ -86,37 +108,34 @@ async function runVisualizer(context: vscode.ExtensionContext): Promise<void> {
     return;
   }
 
-  // ── 4. Open (or reuse) a WebView panel ──────────────────────────────────
+  // ── 5. Open WebView panel ────────────────────────────────────────────────
   const panel = vscode.window.createWebviewPanel(
-    "algoViz",                          // internal identifier
-    "Algorithm Visualizer",             // tab title
-    vscode.ViewColumn.Beside,           // open in split pane
+    "algoViz",
+    "Algorithm Visualizer",
+    vscode.ViewColumn.Beside,
     {
-      enableScripts: true,              // allow JS in the webview
+      enableScripts: true,
       localResourceRoots: [
-        // Allow the webview to load files from the webview/ folder
         vscode.Uri.joinPath(context.extensionUri, "webview"),
       ],
     }
   );
 
-  // ── 5. Load HTML and inject step data ────────────────────────────────────
-  panel.webview.html = buildWebviewHtml(panel.webview, context, steps);
+  // ── 6. Build HTML — now passes perfData too ──────────────────────────────
+  panel.webview.html = buildWebviewHtml(panel.webview, context, steps, perfData);
 }
 
 // ---------------------------------------------------------------------------
-// Python runner (Promise wrapper around child_process.exec)
+// Python runner (unchanged)
 // ---------------------------------------------------------------------------
 
 function runPython(filePath: string, cwd: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    // Try "python3" first; fall back to "python" for Windows environments
     const pythonBin = process.platform === "win32" ? "python" : "python3";
     const cmd = `${pythonBin} "${filePath}"`;
 
     cp.exec(cmd, { cwd }, (error, _stdout, stderr) => {
       if (error) {
-        // stderr usually has the traceback — include it for clarity
         reject(new Error(stderr || error.message));
       } else {
         resolve();
@@ -126,22 +145,15 @@ function runPython(filePath: string, cwd: string): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// WebView HTML builder
+// WebView HTML builder — only change: accepts + injects perfData
 // ---------------------------------------------------------------------------
 
-/**
- * Reads the webview source files from disk (or embeds them inline for MVP
- * simplicity), substitutes the steps data, and returns the full HTML string.
- *
- * For this MVP we embed CSS + JS inline rather than using local resource URIs
- * so the extension works immediately without any build step for the webview.
- */
 function buildWebviewHtml(
   webview: vscode.Webview,
   context: vscode.ExtensionContext,
-  steps: Step[]
+  steps: Step[],
+  perfData: PerfPoint[]        // ← NEW parameter
 ): string {
-  // Read the three webview source files that sit next to extension.ts
   const webviewDir = path.join(context.extensionPath, "webview");
 
   const readFile = (name: string): string => {
@@ -149,17 +161,15 @@ function buildWebviewHtml(
     if (fs.existsSync(filePath)) {
       return fs.readFileSync(filePath, "utf-8");
     }
-    // Graceful fallback so the extension doesn't crash during development
     return `/* ${name} not found */`;
   };
 
   const css = readFile("styles.css");
   const js  = readFile("script.js");
 
-  // Safely JSON-encode the steps array and inject it as a JS global.
-  // The nonce prevents the VS Code Content Security Policy from blocking it.
-  const nonce = getNonce();
+  const nonce     = getNonce();
   const stepsJson = JSON.stringify(steps);
+  const perfJson  = JSON.stringify(perfData);   // ← NEW
 
   return /* html */ `<!DOCTYPE html>
 <html lang="en">
@@ -177,33 +187,33 @@ function buildWebviewHtml(
 
   <!-- ── Header ─────────────────────────────────────────────────── -->
   <header class="header">
-    <h1 class="header__title">⚡ Bubble Sort Visualizer</h1>
+    <h1 class="header__title">&#9889; Bubble Sort Visualizer</h1>
     <div class="header__meta">
       <span id="stepCounter" class="badge">Step 0 / 0</span>
-      <span id="lineNumber" class="badge badge--line">Line —</span>
+      <span id="lineNumber" class="badge badge--line">Line --</span>
     </div>
   </header>
 
-  <!-- ── Array bars ──────────────────────────────────────────────── -->
+  <!-- ── Array bars (EXISTING — untouched) ───────────────────────── -->
   <section class="viz-section">
     <div id="arrayContainer" class="array-container" aria-label="Array visualization"></div>
   </section>
 
-  <!-- ── Step info strip ─────────────────────────────────────────── -->
-  <div id="stepInfo" class="step-info">Initializing…</div>
+  <!-- ── Step info strip (EXISTING — untouched) ──────────────────── -->
+  <div id="stepInfo" class="step-info">Initializing...</div>
 
-  <!-- ── Controls ────────────────────────────────────────────────── -->
+  <!-- ── Controls (EXISTING — untouched) ─────────────────────────── -->
   <div class="controls">
-    <button id="btnPlay"  class="btn btn--primary">▶ Play</button>
-    <button id="btnPause" class="btn" disabled>⏸ Pause</button>
-    <button id="btnReset" class="btn">↺ Reset</button>
+    <button id="btnPlay"  class="btn btn--primary">&#9654; Play</button>
+    <button id="btnPause" class="btn" disabled>&#9646;&#9646; Pause</button>
+    <button id="btnReset" class="btn">&#8634; Reset</button>
     <label class="speed-label">
       Speed
       <input id="speedSlider" type="range" min="50" max="1000" value="500" step="50" />
     </label>
   </div>
 
-  <!-- ── Legend ──────────────────────────────────────────────────── -->
+  <!-- ── Legend (EXISTING — untouched) ───────────────────────────── -->
   <div class="legend">
     <span class="legend__item legend__item--compare">Comparing</span>
     <span class="legend__item legend__item--swap">Swapping</span>
@@ -211,9 +221,51 @@ function buildWebviewHtml(
     <span class="legend__item legend__item--done">Sorted</span>
   </div>
 
-  <!-- Inject step data as a global before script.js runs -->
+  <!-- ════════════════════════════════════════════════════════════════
+       NEW SECTIONS BELOW — added without touching anything above
+       ════════════════════════════════════════════════════════════════ -->
+
+  <!-- ── Divider ──────────────────────────────────────────────────── -->
+  <div class="section-divider">
+    <span>Performance Analysis</span>
+  </div>
+
+  <!-- ── Complexity badge ─────────────────────────────────────────── -->
+  <div class="complexity-row">
+    <span class="complexity-label">Estimated Complexity:</span>
+    <span id="complexityBadge" class="complexity-badge">--</span>
+    <span id="complexityNote" class="complexity-note"></span>
+  </div>
+
+  <!-- ── Performance graph ────────────────────────────────────────── -->
+  <div class="graph-section">
+    <div class="graph-header">
+      <span class="graph-title">Runtime vs Input Size</span>
+      <span class="graph-subtitle">averaged over 3 runs</span>
+    </div>
+    <canvas id="perfChart" class="perf-canvas" aria-label="Performance graph"></canvas>
+    <div id="graphEmpty" class="graph-empty">
+      No performance data. Make sure benchmark.py is in the same folder.
+    </div>
+  </div>
+
+  <!-- ── AI Explanation ───────────────────────────────────────────── -->
+  <div class="ai-section">
+    <label class="ai-toggle-label">
+      <input type="checkbox" id="aiToggle" class="ai-toggle-input" />
+      <span class="ai-toggle-track"><span class="ai-toggle-thumb"></span></span>
+      Show AI Explanation
+    </label>
+    <div id="aiBox" class="ai-box" hidden>
+      <div class="ai-box__header">&#129302; AI Analysis</div>
+      <p id="aiText" class="ai-box__text"></p>
+    </div>
+  </div>
+
+  <!-- Inject both datasets as globals -->
   <script nonce="${nonce}">
     window.ALGO_STEPS = ${stepsJson};
+    window.PERF_DATA  = ${perfJson};
   </script>
   <script nonce="${nonce}">${js}</script>
 </body>
@@ -224,7 +276,6 @@ function buildWebviewHtml(
 // Utility
 // ---------------------------------------------------------------------------
 
-/** Generate a random nonce for Content Security Policy. */
 function getNonce(): string {
   const chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -234,7 +285,7 @@ function getNonce(): string {
 }
 
 // ---------------------------------------------------------------------------
-// Shared types (mirrored from Python output)
+// Types
 // ---------------------------------------------------------------------------
 
 interface Step {
@@ -243,4 +294,10 @@ interface Step {
   i: number;
   j: number;
   line: number;
+}
+
+// ← NEW
+interface PerfPoint {
+  n: number;
+  time: number;
 }

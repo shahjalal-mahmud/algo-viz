@@ -18,9 +18,9 @@
 
   /* Bar states */
   --bar-normal:  #1f6feb;
-  --bar-compare: #f0883e;   /* orange — currently being compared */
-  --bar-swap:    #f85149;   /* red    — being swapped            */
-  --bar-done:    #3fb950;   /* green  — confirmed sorted         */
+  --bar-compare: #f0883e;
+  --bar-swap:    #f85149;
+  --bar-done:    #3fb950;
 
   /* Typography */
   --font-mono:  "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
@@ -41,7 +41,6 @@ html, body {
   overflow-x: hidden;
 }
 
-/* ── Layout ───────────────────────────────────────────────────────────────── */
 body {
   display: flex;
   flex-direction: column;
@@ -68,10 +67,7 @@ body {
   letter-spacing: -0.02em;
 }
 
-.header__meta {
-  display: flex;
-  gap: 0.5rem;
-}
+.header__meta { display: flex; gap: 0.5rem; }
 
 /* ── Badges ───────────────────────────────────────────────────────────────── */
 .badge {
@@ -125,7 +121,6 @@ body {
   cursor: default;
 }
 
-/* Value label inside the bar */
 .bar::after {
   content: attr(data-value);
   position: absolute;
@@ -138,7 +133,6 @@ body {
   white-space: nowrap;
 }
 
-/* Index label below the bar */
 .bar::before {
   content: attr(data-index);
   position: absolute;
@@ -151,16 +145,14 @@ body {
   opacity: 0.6;
 }
 
-/* ── Bar state colours ────────────────────────────────────────────────────── */
 .bar.compare { background: var(--bar-compare); }
 .bar.swap    { background: var(--bar-swap);    }
 .bar.done    { background: var(--bar-done);    }
 
-/* Pulse animation on swap */
 @keyframes pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.6); }
-  70%  { box-shadow: 0 0 0 10px rgba(248, 81, 73, 0);  }
-  100% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0);     }
+  0%   { box-shadow: 0 0 0 0   rgba(248, 81, 73, 0.6); }
+  70%  { box-shadow: 0 0 0 10px rgba(248, 81, 73, 0);   }
+  100% { box-shadow: 0 0 0 0   rgba(248, 81, 73, 0);    }
 }
 .bar.swap { animation: pulse 0.4s ease; }
 
@@ -204,10 +196,7 @@ body {
   border-color: var(--accent);
 }
 
-.btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn--primary {
   background: var(--accent);
@@ -237,11 +226,7 @@ body {
 }
 
 /* ── Legend ───────────────────────────────────────────────────────────────── */
-.legend {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
+.legend { display: flex; gap: 1rem; flex-wrap: wrap; }
 
 .legend__item {
   display: inline-flex;
@@ -263,3 +248,195 @@ body {
 .legend__item--swap::before    { background: var(--bar-swap);    }
 .legend__item--normal::before  { background: var(--bar-normal);  }
 .legend__item--done::before    { background: var(--bar-done);    }
+
+
+/* =============================================================================
+   NEW STYLES BELOW
+   Everything above is the original, unchanged.
+   ============================================================================= */
+
+/* ── Section divider ──────────────────────────────────────────────────────── */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 0.5rem;
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Complexity row ───────────────────────────────────────────────────────── */
+.complexity-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.complexity-label {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+.complexity-badge {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* Colour variants depending on detected complexity */
+.complexity-badge--green  { background: rgba(63,185,80,0.15);  border-color: #3fb950; color: #3fb950; }
+.complexity-badge--yellow { background: rgba(240,136,62,0.15); border-color: #f0883e; color: #f0883e; }
+.complexity-badge--red    { background: rgba(248,81,73,0.15);  border-color: #f85149; color: #f85149; }
+
+.complexity-note {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* ── Graph section ────────────────────────────────────────────────────────── */
+.graph-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.graph-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.graph-title {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.graph-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+/* The canvas fills the width of its container */
+.perf-canvas {
+  width: 100%;
+  height: 200px;
+  border-radius: 4px;
+  display: block;
+}
+
+.graph-empty {
+  text-align: center;
+  padding: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  display: none;
+}
+
+/* ── AI explanation section ───────────────────────────────────────────────── */
+.ai-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-bottom: 1rem;
+}
+
+/* Toggle switch — pure CSS, no images */
+.ai-toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  user-select: none;
+}
+
+.ai-toggle-input { display: none; }   /* hide the real checkbox */
+
+.ai-toggle-track {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background: var(--border);
+  border-radius: 10px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.ai-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  background: var(--text-dim);
+  border-radius: 50%;
+  transition: transform 0.2s, background 0.2s;
+}
+
+/* When checked: slide thumb right and colour the track */
+.ai-toggle-input:checked + .ai-toggle-track {
+  background: var(--accent);
+}
+
+.ai-toggle-input:checked + .ai-toggle-track .ai-toggle-thumb {
+  transform: translateX(16px);
+  background: #fff;
+}
+
+/* AI explanation box */
+.ai-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.ai-box__header {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.04em;
+}
+
+.ai-box__text {
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;   /* preserves the \n line breaks from JS */
+}
