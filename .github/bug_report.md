@@ -45,13 +45,13 @@ paste error output here
 
 ## 🌍 Environment
 
-| Field | Value |
-|-------|-------|
-| OS | e.g. Windows 11 / macOS 14 / Ubuntu 22.04 |
-| VS Code Version | e.g. 1.88.0 |
-| AlgoViz Version | e.g. 0.1.0 |
-| Node.js Version | e.g. 18.12.0 |
-| Python Version | e.g. 3.11.2 |
+| Field           | Value                                     |
+|-----------------|-------------------------------------------|
+| OS              | e.g. Windows 11 / macOS 14 / Ubuntu 22.04 |
+| VS Code Version | e.g. 1.88.0                               |
+| AlgoViz Version | e.g. 0.1.0                                |
+| Node.js Version | e.g. 18.12.0                              |
+| Python Version  | e.g. 3.11.2                               |
 
 ---
 

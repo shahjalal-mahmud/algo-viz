@@ -44,8 +44,8 @@ Closes # <!-- Link the issue this resolves, e.g. "Closes #42" -->
 <!-- If this touches the UI or animation, please include a before/after screenshot or recording.
      This helps reviewers a lot. -->
 
-| Before | After |
-|--------|-------|
+| Before         | After          |
+|----------------|----------------|
 | _(screenshot)_ | _(screenshot)_ |
 
 ---
