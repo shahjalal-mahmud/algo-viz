@@ -22,7 +22,7 @@ This document will walk you through everything you need to know to get started.
     - [Branch Naming Convention](#branch-naming-convention)
     - [Making Changes](#making-changes)
   - [📝 Commit Message Format](#-commit-message-format)
-  - [🗂️ Project Structure](#️-project-structure)
+  - [🗂️ Project Structure](#-project-structure)
     - [Adding a New Algorithm](#adding-a-new-algorithm)
   - [🔃 Pull Request Guidelines](#-pull-request-guidelines)
     - [Before Submitting](#before-submitting)
@@ -57,16 +57,16 @@ Disrespectful or exclusionary behavior will not be tolerated.
 
 There are many ways to contribute — you don't have to write code to make a difference:
 
-| Type | Examples |
-|------|----------|
-| 🧩 **New Algorithm** | Add Merge Sort, Quick Sort, BFS, DFS visualization |
-| 🎨 **UI/UX** | Improve animation smoothness, layout, colors |
-| 🐛 **Bug Fix** | Fix a broken step, graph glitch, or incorrect complexity detection |
-| 📖 **Documentation** | Improve README, add usage examples, write tutorials |
-| 🧪 **Testing** | Add test cases, benchmark edge cases |
-| 🤖 **AI Integration** | Help build the AI explanation/suggestion layer |
-| 🌍 **Multi-language** | Extend support beyond Python (C++, Java, JS) |
-| 💬 **Feedback** | Open issues with ideas, suggestions, or pain points |
+| Type                  | Examples                                                           |
+|-----------------------|--------------------------------------------------------------------|
+| 🧩 **New Algorithm**  | Add Merge Sort, Quick Sort, BFS, DFS visualization                 |
+| 🎨 **UI/UX**          | Improve animation smoothness, layout, colors                       |
+| 🐛 **Bug Fix**        | Fix a broken step, graph glitch, or incorrect complexity detection |
+| 📖 **Documentation**  | Improve README, add usage examples, write tutorials                |
+| 🧪 **Testing**        | Add test cases, benchmark edge cases                               |
+| 🤖 **AI Integration** | Help build the AI explanation/suggestion layer                     |
+| 🌍 **Multi-language** | Extend support beyond Python (C++, Java, JS)                       |
+| 💬 **Feedback**       | Open issues with ideas, suggestions, or pain points                |
 
 ---
 
@@ -150,15 +150,15 @@ Optional longer explanation if needed.
 
 **Types:**
 
-| Type | When to use |
-|------|-------------|
-| `feat` | New feature or algorithm |
-| `fix` | Bug fix |
-| `docs` | Documentation only |
-| `style` | Formatting, no logic change |
+| Type       | When to use                          |
+|------------|--------------------------------------|
+| `feat`     | New feature or algorithm             |
+| `fix`      | Bug fix                              |
+| `docs`     | Documentation only                   |
+| `style`    | Formatting, no logic change          |
 | `refactor` | Code restructure, no behavior change |
-| `test` | Adding or fixing tests |
-| `chore` | Build process, dependency updates |
+| `test`     | Adding or fixing tests               |
+| `chore`    | Build process, dependency updates    |
 
 **Examples:**
 

@@ -79,13 +79,13 @@ IDLE → PLAYING → PAUSED → PLAYING
 IDLE → STEPPING (manual forward/back)
 ```
 
-| State | Description |
-|-------|-------------|
-| `IDLE` | Steps loaded, not yet started |
-| `PLAYING` | Auto-playing through steps |
-| `PAUSED` | Auto-play suspended |
+| State      | Description                         |
+|------------|-------------------------------------|
+| `IDLE`     | Steps loaded, not yet started       |
+| `PLAYING`  | Auto-playing through steps          |
+| `PAUSED`   | Auto-play suspended                 |
 | `STEPPING` | User manually stepping forward/back |
-| `DONE` | All steps rendered |
+| `DONE`     | All steps rendered                  |
 
 ---
 
@@ -119,13 +119,13 @@ function renderArray(array) {
 
 ### Bar Color States
 
-| Color | Meaning |
-|-------|---------|
-| `--color-bar-default` | Unaffected element |
-| `--color-bar-active` | Currently being compared or swapped |
-| `--color-bar-sorted` | Element in its final sorted position |
-| `--color-bar-pivot` | Pivot element (Quick Sort) |
-| `--color-bar-found` | Found element (Binary Search) |
+| Color                 | Meaning                              |
+|-----------------------|--------------------------------------|
+| `--color-bar-default` | Unaffected element                   |
+| `--color-bar-active`  | Currently being compared or swapped  |
+| `--color-bar-sorted`  | Element in its final sorted position |
+| `--color-bar-pivot`   | Pivot element (Quick Sort)           |
+| `--color-bar-found`   | Found element (Binary Search)        |
 
 Colors are CSS variables, making theming easy.
 
@@ -135,15 +135,15 @@ Colors are CSS variables, making theming easy.
 
 Each step type triggers a distinct visual:
 
-| Step Type | Visual Effect |
-|-----------|---------------|
-| `init` | Render all bars in default color |
-| `compare` | Highlight `indices[0]` and `indices[1]` in active color, brief flash |
-| `swap` | Flash both bars, animate height exchange, re-render |
-| `insert` | Animate element "lifting" and sliding to new position |
-| `mark` | Apply persistent color to index (pivot, boundary) |
-| `annotate` | Display message in the info bar below the canvas |
-| `done` | Flash all bars in sorted color |
+| Step Type  | Visual Effect                                                        |
+|------------|----------------------------------------------------------------------|
+| `init`     | Render all bars in default color                                     |
+| `compare`  | Highlight `indices[0]` and `indices[1]` in active color, brief flash |
+| `swap`     | Flash both bars, animate height exchange, re-render                  |
+| `insert`   | Animate element "lifting" and sliding to new position                |
+| `mark`     | Apply persistent color to index (pivot, boundary)                    |
+| `annotate` | Display message in the info bar below the canvas                     |
+| `done`     | Flash all bars in sorted color                                       |
 
 ### Swap Animation Detail
 
@@ -185,26 +185,26 @@ The source code is syntax-highlighted using a minimal tokenizer (no external lib
 
 ## Playback Controls
 
-| Control | Action |
-|---------|--------|
-| ▶ Play | Start auto-play from current position |
-| ⏸ Pause | Suspend auto-play |
-| ⏭ Step Forward | Advance one step |
-| ⏮ Step Back | Go back one step |
-| ⏩ Speed Up | Decrease `speed` by 50ms |
-| ⏪ Slow Down | Increase `speed` by 50ms |
-| ↺ Reset | Return to step 0, re-render init state |
+| Control        | Action                                 |
+|----------------|----------------------------------------|
+| ▶ Play         | Start auto-play from current position  |
+| ⏸ Pause        | Suspend auto-play                      |
+| ⏭ Step Forward | Advance one step                       |
+| ⏮ Step Back    | Go back one step                       |
+| ⏩ Speed Up     | Decrease `speed` by 50ms               |
+| ⏪ Slow Down    | Increase `speed` by 50ms               |
+| ↺ Reset        | Return to step 0, re-render init state |
 
 Keyboard shortcuts *(planned)*:
 
-| Key | Action |
-|-----|--------|
+| Key     | Action       |
+|---------|--------------|
 | `Space` | Play / Pause |
-| `→` | Step forward |
-| `←` | Step back |
-| `+` | Speed up |
-| `-` | Slow down |
-| `R` | Reset |
+| `→`     | Step forward |
+| `←`     | Step back    |
+| `+`     | Speed up     |
+| `-`     | Slow down    |
+| `R`     | Reset        |
 
 ---
 

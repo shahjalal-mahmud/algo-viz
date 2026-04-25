@@ -1,10 +1,10 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/VS%20Code-Extension-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white" />
-<img src="https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white" />
-<img src="https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge" />
-<img src="https://img.shields.io/badge/Status-MVP-f59e0b?style=for-the-badge" />
-<img src="https://img.shields.io/badge/Open%20Source-❤️-ef4444?style=for-the-badge" />
+<img src="https://img.shields.io/badge/VS%20Code-Extension-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white"  alt="VS Code-Extension"/>
+<img src="https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white"  alt="Python-3.8"/>
+<img src="https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge"  alt="License-MIT"/>
+<img src="https://img.shields.io/badge/Status-MVP-f59e0b?style=for-the-badge"  alt="MVP"/>
+<img src="https://img.shields.io/badge/Open%20Source-❤️-ef4444?style=for-the-badge"  alt="Open Source"/>
 
 <br /><br />
 
@@ -145,11 +145,11 @@ Stop guessing `O(n²)`. Let the data tell you.
 
 AlgoViz analyzes your actual runtime data and fits it against known complexity curves:
 
-| Normalized Curve | What It Reveals |
-|-----------------|-----------------|
-| `time / n` | Is this O(n)? → Should flatten |
+| Normalized Curve   | What It Reveals                      |
+|--------------------|--------------------------------------|
+| `time / n`         | Is this O(n)? → Should flatten       |
 | `time / (n log n)` | Is this O(n log n)? → Should flatten |
-| `time / n²` | Is this O(n²)? → Should flatten |
+| `time / n²`        | Is this O(n²)? → Should flatten      |
 
 The curve that **flattens** is your algorithm's complexity. You'll *see* it happen.
 
@@ -370,15 +370,15 @@ AlgoViz is actively being developed. Here's where we're headed:
 
 Most tools either show you pre-built animations that have nothing to do with your code, or they give you an "Accepted" and send you on your way. AlgoViz is neither.
 
-| Feature | AlgoViz | Static Visualizers | LeetCode / Codeforces |
-|---|---|---|---|
-| Works inside VS Code | ✅ | ❌ | ❌ |
-| Visualizes YOUR code | ✅ | ❌ | ❌ |
-| Step-by-step execution | ✅ | Limited | ❌ |
-| Real performance data | ✅ | ❌ | ❌ |
-| Empirical complexity | ✅ | ❌ | ❌ |
-| AI insights | ✅ *(soon)* | ❌ | Limited |
-| Open Source | ✅ | Varies | ❌ |
+| Feature                | AlgoViz    | Static Visualizers | LeetCode / Codeforces |
+|------------------------|------------|--------------------|-----------------------|
+| Works inside VS Code   | ✅          | ❌                  | ❌                     |
+| Visualizes YOUR code   | ✅          | ❌                  | ❌                     |
+| Step-by-step execution | ✅          | Limited            | ❌                     |
+| Real performance data  | ✅          | ❌                  | ❌                     |
+| Empirical complexity   | ✅          | ❌                  | ❌                     |
+| AI insights            | ✅ *(soon)* | ❌                  | Limited               |
+| Open Source            | ✅          | Varies             | ❌                     |
 
 ---
 
@@ -460,7 +460,7 @@ If AlgoViz has helped you understand an algorithm better:
 
 ## 📄 License
 
-This project is licensed under the **MIT License** — see the [`LICENSE`](LICENSE) file for details.
+This project is licensed under the **MIT License** — see the [`LICENSE`](LICENSE.txt) file for details.
 
 You're free to use, modify, and distribute AlgoViz. If you build something cool on top of it, we'd love to hear about it.
 

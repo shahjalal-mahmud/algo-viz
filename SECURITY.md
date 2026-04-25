@@ -4,9 +4,9 @@
 
 AlgoViz is currently in early development (MVP phase). We provide security fixes for the following versions:
 
-| Version | Supported |
-|---------|-----------|
-| `0.1.x` (latest) | ✅ Yes |
+| Version          | Supported             |
+|------------------|-----------------------|
+| `0.1.x` (latest) | ✅ Yes                 |
 | Earlier versions | ❌ No — please upgrade |
 
 As the project matures and more versions are released, this table will be updated accordingly.
@@ -42,12 +42,12 @@ Please provide as much of the following as you can:
 
 ## What to Expect
 
-| Timeline | What Happens |
-|----------|-------------|
-| Within **48 hours** | We acknowledge your report |
-| Within **7 days** | We assess severity and begin investigation |
-| Within **14 days** | We share our findings and expected fix timeline |
-| After fix is released | We credit you (unless you prefer anonymity) |
+| Timeline              | What Happens                                    |
+|-----------------------|-------------------------------------------------|
+| Within **48 hours**   | We acknowledge your report                      |
+| Within **7 days**     | We assess severity and begin investigation      |
+| Within **14 days**    | We share our findings and expected fix timeline |
+| After fix is released | We credit you (unless you prefer anonymity)     |
 
 We aim to be transparent throughout the process and will keep you updated at each stage.
 

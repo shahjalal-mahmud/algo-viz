@@ -42,10 +42,10 @@ AlgoViz is composed of three layers that communicate through structured JSON fil
 
 The layers never call each other directly. Communication happens entirely through two JSON files written to disk:
 
-| File | Written by | Read by | Purpose |
-|------|-----------|---------|---------|
-| `steps.json` | `viz.py` (Python) | WebView `animator.js` | Execution step replay |
-| `performance.json` | `benchmark.py` (Python) | WebView `graph.js` | Runtime data for graphing |
+| File               | Written by              | Read by               | Purpose                   |
+|--------------------|-------------------------|-----------------------|---------------------------|
+| `steps.json`       | `viz.py` (Python)       | WebView `animator.js` | Execution step replay     |
+| `performance.json` | `benchmark.py` (Python) | WebView `graph.js`    | Runtime data for graphing |
 
 This decoupled design means any layer can be replaced or extended independently.
 
@@ -169,7 +169,6 @@ viz.save()
     "array": [34, 64, 25, 12, 22, 11, 90],
     "line": 11
   }
-  // ... hundreds more steps
 ]
 ```
 
@@ -321,11 +320,11 @@ The AI layer is planned for Phase 3. Here is the intended architecture:
 
 ### Planned Integration Points
 
-| Where | What |
-|-------|------|
-| `src/aiService.ts` | Handles API calls, prompt construction, response parsing |
-| `webview/ai-panel.js` | Renders AI output in a third panel column |
-| `viz.py` | Will export richer metadata (operation counts, recursion depth) for better AI context |
+| Where                 | What                                                                                  |
+|-----------------------|---------------------------------------------------------------------------------------|
+| `src/aiService.ts`    | Handles API calls, prompt construction, response parsing                              |
+| `webview/ai-panel.js` | Renders AI output in a third panel column                                             |
+| `viz.py`              | Will export richer metadata (operation counts, recursion depth) for better AI context |
 
 ### Prompt Strategy
 
