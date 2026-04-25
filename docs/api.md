@@ -61,10 +61,10 @@ Records the initial state of your data structure. **Always call this first**, be
 
 **Parameters**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `array` | `list` | ✅ | The array to visualize. Must be a flat list of numbers. |
-| `label` | `str` | ❌ | Optional label shown in the animation header (e.g., `"Input Array"`). |
+| Parameter | Type   | Required | Description                                                           |
+|-----------|--------|----------|-----------------------------------------------------------------------|
+| `array`   | `list` | ✅        | The array to visualize. Must be a flat list of numbers.               |
+| `label`   | `str`  | ❌        | Optional label shown in the animation header (e.g., `"Input Array"`). |
 
 **Example**
 
@@ -92,12 +92,12 @@ Records a comparison between two elements. Does **not** modify the array.
 
 **Parameters**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `array` | `list` | ✅ | The current array state. |
-| `i` | `int` | ✅ | Index of the first element being compared. |
-| `j` | `int` | ✅ | Index of the second element being compared. |
-| `line` | `int` | ❌ | Source line number override (auto-detected if omitted). |
+| Parameter | Type   | Required | Description                                             |
+|-----------|--------|----------|---------------------------------------------------------|
+| `array`   | `list` | ✅        | The current array state.                                |
+| `i`       | `int`  | ✅        | Index of the first element being compared.              |
+| `j`       | `int`  | ✅        | Index of the second element being compared.             |
+| `line`    | `int`  | ❌        | Source line number override (auto-detected if omitted). |
 
 **Example**
 
@@ -126,12 +126,12 @@ Records a swap between two elements **and performs the swap** on the array in-pl
 
 **Parameters**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `array` | `list` | ✅ | The array to swap in. |
-| `i` | `int` | ✅ | Index of the first element. |
-| `j` | `int` | ✅ | Index of the second element. |
-| `line` | `int` | ❌ | Source line number override. |
+| Parameter | Type   | Required | Description                  |
+|-----------|--------|----------|------------------------------|
+| `array`   | `list` | ✅        | The array to swap in.        |
+| `i`       | `int`  | ✅        | Index of the first element.  |
+| `j`       | `int`  | ✅        | Index of the second element. |
+| `line`    | `int`  | ❌        | Source line number override. |
 
 > ⚠️ `viz.swap()` performs the actual swap — you do **not** need to swap manually after calling this.
 
@@ -161,12 +161,12 @@ Records an element being picked up and inserted at a new position. Intended for 
 
 **Parameters**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `array` | `list` | ✅ | The current array state. |
-| `from_index` | `int` | ✅ | Index of element being moved. |
-| `to_index` | `int` | ✅ | Target index for insertion. |
-| `line` | `int` | ❌ | Source line number override. |
+| Parameter    | Type   | Required | Description                   |
+|--------------|--------|----------|-------------------------------|
+| `array`      | `list` | ✅        | The current array state.      |
+| `from_index` | `int`  | ✅        | Index of element being moved. |
+| `to_index`   | `int`  | ✅        | Target index for insertion.   |
+| `line`       | `int`  | ❌        | Source line number override.  |
 
 **Example**
 
@@ -187,13 +187,13 @@ Marks a specific element in the array — useful for highlighting pivots, bounda
 
 **Parameters**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `array` | `list` | ✅ | Current array state. |
-| `index` | `int` | ✅ | Index of the element to mark. |
-| `color` | `str` | ❌ | Highlight color hint: `"pivot"`, `"found"`, `"boundary"`. Default: `"pivot"`. |
-| `label` | `str` | ❌ | Text label shown above the element. |
-| `line` | `int` | ❌ | Source line number override. |
+| Parameter | Type   | Required | Description                                                                   |
+|-----------|--------|----------|-------------------------------------------------------------------------------|
+| `array`   | `list` | ✅        | Current array state.                                                          |
+| `index`   | `int`  | ✅        | Index of the element to mark.                                                 |
+| `color`   | `str`  | ❌        | Highlight color hint: `"pivot"`, `"found"`, `"boundary"`. Default: `"pivot"`. |
+| `label`   | `str`  | ❌        | Text label shown above the element.                                           |
+| `line`    | `int`  | ❌        | Source line number override.                                                  |
 
 **Example**
 
@@ -210,10 +210,10 @@ Records a text annotation — a message that appears in the animation panel at t
 
 **Parameters**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `message` | `str` | ✅ | The message to display. |
-| `line` | `int` | ❌ | Source line number override. |
+| Parameter | Type  | Required | Description                  |
+|-----------|-------|----------|------------------------------|
+| `message` | `str` | ✅        | The message to display.      |
+| `line`    | `int` | ❌        | Source line number override. |
 
 **Example**
 
@@ -229,9 +229,9 @@ Writes all recorded steps to disk. **Always call this at the end of your file.**
 
 **Parameters**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `path` | `str` | ❌ | `"steps.json"` | Output file path. |
+| Parameter | Type  | Required | Default        | Description       |
+|-----------|-------|----------|----------------|-------------------|
+| `path`    | `str` | ❌        | `"steps.json"` | Output file path. |
 
 **Example**
 
@@ -276,11 +276,11 @@ viz.config(
 )
 ```
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `speed` | `int` | `200` | Default animation delay in ms |
-| `max_steps` | `int` | `10000` | Max steps before recording stops (safety limit) |
-| `auto_line` | `bool` | `True` | Auto-detect source line via `inspect` module |
+| Option      | Type   | Default | Description                                     |
+|-------------|--------|---------|-------------------------------------------------|
+| `speed`     | `int`  | `200`   | Default animation delay in ms                   |
+| `max_steps` | `int`  | `10000` | Max steps before recording stops (safety limit) |
+| `auto_line` | `bool` | `True`  | Auto-detect source line via `inspect` module    |
 
 ---
 
@@ -334,9 +334,9 @@ viz.save()
 
 ## Error Reference
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `VisualizerNotInitializedError` | Called `viz.compare()` before `viz.init()` | Always call `viz.init(arr)` first |
-| `IndexOutOfBoundsError` | `i` or `j` outside array bounds | Check your loop bounds |
-| `MaxStepsExceeded` | Algorithm exceeded `max_steps` limit | Reduce input size or increase `viz.config(max_steps=...)` |
-| `steps.json not written` | `viz.save()` never called | Add `viz.save()` at the end of your file |
+| Error                           | Cause                                      | Fix                                                       |
+|---------------------------------|--------------------------------------------|-----------------------------------------------------------|
+| `VisualizerNotInitializedError` | Called `viz.compare()` before `viz.init()` | Always call `viz.init(arr)` first                         |
+| `IndexOutOfBoundsError`         | `i` or `j` outside array bounds            | Check your loop bounds                                    |
+| `MaxStepsExceeded`              | Algorithm exceeded `max_steps` limit       | Reduce input size or increase `viz.config(max_steps=...)` |
+| `steps.json not written`        | `viz.save()` never called                  | Add `viz.save()` at the end of your file                  |

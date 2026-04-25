@@ -12,21 +12,21 @@ Want to help shape the roadmap? [Open a feature request](https://github.com/shah
 
 The foundation. Everything needed to go from code to visualization.
 
-| Feature | Status |
-|---------|--------|
-| VS Code extension scaffold (TypeScript) | ✅ Done |
+| Feature                                                             | Status |
+|---------------------------------------------------------------------|--------|
+| VS Code extension scaffold (TypeScript)                             | ✅ Done |
 | `viz.py` instrumentation helper (`init`, `compare`, `swap`, `save`) | ✅ Done |
-| Bubble Sort step-by-step animation | ✅ Done |
-| Line tracking (code highlighting in sync with animation) | ✅ Done |
-| `steps.json` execution recording pipeline | ✅ Done |
-| Automatic benchmarking across multiple input sizes | ✅ Done |
-| `performance.json` data pipeline | ✅ Done |
-| Canvas-based interactive performance graph | ✅ Done |
-| Empirical complexity detection (`O(n)`, `O(n log n)`, `O(n²)`) | ✅ Done |
-| Normalized curve comparison (visual complexity fitting) | ✅ Done |
-| Rule-based explanation system | ✅ Done |
-| Split-screen WebView (animation + graph) | ✅ Done |
-| MIT License + README + CONTRIBUTING.md | ✅ Done |
+| Bubble Sort step-by-step animation                                  | ✅ Done |
+| Line tracking (code highlighting in sync with animation)            | ✅ Done |
+| `steps.json` execution recording pipeline                           | ✅ Done |
+| Automatic benchmarking across multiple input sizes                  | ✅ Done |
+| `performance.json` data pipeline                                    | ✅ Done |
+| Canvas-based interactive performance graph                          | ✅ Done |
+| Empirical complexity detection (`O(n)`, `O(n log n)`, `O(n²)`)      | ✅ Done |
+| Normalized curve comparison (visual complexity fitting)             | ✅ Done |
+| Rule-based explanation system                                       | ✅ Done |
+| Split-screen WebView (animation + graph)                            | ✅ Done |
+| MIT License + README + CONTRIBUTING.md                              | ✅ Done |
 
 ---
 
@@ -38,39 +38,39 @@ Expanding what AlgoViz can visualize and making the experience smoother.
 
 ### 🧩 Algorithm Coverage
 
-| Algorithm | Status |
-|-----------|--------|
-| Selection Sort | 🔲 Planned |
-| Insertion Sort | 🔲 Planned |
-| Merge Sort (with recursion tree) | 🔲 Planned |
-| Quick Sort (with pivot highlighting) | 🔲 Planned |
-| Binary Search (on sorted array) | 🔲 Planned |
-| Linear Search | 🔲 Planned |
-| DFS on graphs | 🔲 Planned |
-| BFS on graphs | 🔲 Planned |
+| Algorithm                                         | Status     |
+|---------------------------------------------------|------------|
+| Selection Sort                                    | 🔲 Planned |
+| Insertion Sort                                    | 🔲 Planned |
+| Merge Sort (with recursion tree)                  | 🔲 Planned |
+| Quick Sort (with pivot highlighting)              | 🔲 Planned |
+| Binary Search (on sorted array)                   | 🔲 Planned |
+| Linear Search                                     | 🔲 Planned |
+| DFS on graphs                                     | 🔲 Planned |
+| BFS on graphs                                     | 🔲 Planned |
 | Linked List operations (insert, delete, traverse) | 🔲 Planned |
-| Stack push/pop | 🔲 Planned |
-| Queue enqueue/dequeue | 🔲 Planned |
+| Stack push/pop                                    | 🔲 Planned |
+| Queue enqueue/dequeue                             | 🔲 Planned |
 
 ### 🎬 Animation Engine
 
-| Feature | Status |
-|---------|--------|
-| Timeline scrubber (step forward/backward) | 🔲 Planned |
-| Adjustable animation speed | 🔲 Planned |
-| Recursion tree view | 🔲 Planned |
-| Stack frame visualization | 🔲 Planned |
-| Pointer/index movement animation | 🔲 Planned |
-| Color-coded comparison regions | 🔲 Planned |
+| Feature                                        | Status     |
+|------------------------------------------------|------------|
+| Timeline scrubber (step forward/backward)      | 🔲 Planned |
+| Adjustable animation speed                     | 🔲 Planned |
+| Recursion tree view                            | 🔲 Planned |
+| Stack frame visualization                      | 🔲 Planned |
+| Pointer/index movement animation               | 🔲 Planned |
+| Color-coded comparison regions                 | 🔲 Planned |
 | Code sync improvements (smoother highlighting) | 🔲 Planned |
 
 ### 📊 Benchmarking & Complexity
 
-| Feature | Status |
-|---------|--------|
-| `O(log n)` complexity detection | 🔲 Planned |
-| `O(n³)` detection | 🔲 Planned |
-| Best / average / worst case comparison | 🔲 Planned |
+| Feature                                 | Status     |
+|-----------------------------------------|------------|
+| `O(log n)` complexity detection         | 🔲 Planned |
+| `O(n³)` detection                       | 🔲 Planned |
+| Best / average / worst case comparison  | 🔲 Planned |
 | Comparison counter overlay on animation | 🔲 Planned |
 
 ---
@@ -81,17 +81,17 @@ Expanding what AlgoViz can visualize and making the experience smoother.
 
 Making AlgoViz not just a viewer, but a teacher.
 
-| Feature | Status |
-|---------|--------|
-| AI-powered plain-English explanations | 🔲 Planned |
-| Pattern recognition (sliding window, two pointers, divide & conquer) | 🔲 Planned |
-| Optimization suggestions ("This could be O(n log n) using...") | 🔲 Planned |
-| Step-level AI commentary ("At this step, we're comparing...") | 🔲 Planned |
-| LeetCode problem context integration | 🔲 Exploring |
-| Auto-instrumentation (no manual `viz.py` calls needed) | 🔲 Planned |
-| Multi-language support: C++ | 🔲 Planned |
-| Multi-language support: Java | 🔲 Planned |
-| Multi-language support: JavaScript | 🔲 Planned |
+| Feature                                                              | Status       |
+|----------------------------------------------------------------------|--------------|
+| AI-powered plain-English explanations                                | 🔲 Planned   |
+| Pattern recognition (sliding window, two pointers, divide & conquer) | 🔲 Planned   |
+| Optimization suggestions ("This could be O(n log n) using...")       | 🔲 Planned   |
+| Step-level AI commentary ("At this step, we're comparing...")        | 🔲 Planned   |
+| LeetCode problem context integration                                 | 🔲 Exploring |
+| Auto-instrumentation (no manual `viz.py` calls needed)               | 🔲 Planned   |
+| Multi-language support: C++                                          | 🔲 Planned   |
+| Multi-language support: Java                                         | 🔲 Planned   |
+| Multi-language support: JavaScript                                   | 🔲 Planned   |
 
 ---
 
@@ -101,14 +101,14 @@ Making AlgoViz not just a viewer, but a teacher.
 
 Taking AlgoViz beyond a VS Code extension.
 
-| Feature | Status |
-|---------|--------|
-| VS Code Marketplace release | 🔲 Planned |
-| Web version (no VS Code required) | 🔲 Exploring |
-| Guided algorithm walkthroughs / Learning Mode | 🔲 Planned |
-| Share visualizations with a link | 🔲 Planned |
-| Community solution comparison | 🔲 Exploring |
-| University / bootcamp integration | 🔲 Exploring |
+| Feature                                        | Status       |
+|------------------------------------------------|--------------|
+| VS Code Marketplace release                    | 🔲 Planned   |
+| Web version (no VS Code required)              | 🔲 Exploring |
+| Guided algorithm walkthroughs / Learning Mode  | 🔲 Planned   |
+| Share visualizations with a link               | 🔲 Planned   |
+| Community solution comparison                  | 🔲 Exploring |
+| University / bootcamp integration              | 🔲 Exploring |
 | Embeddable widget for blogs / course platforms | 🔲 Exploring |
 
 ---
@@ -128,13 +128,13 @@ We prioritize features that: (1) help the most learners, (2) align with the "Run
 
 ## 📌 Legend
 
-| Symbol | Meaning |
-|--------|---------|
-| ✅ Done | Shipped and available |
-| 🚧 In Progress | Actively being worked on |
-| 🔲 Planned | On the roadmap, not yet started |
-| 🔍 Exploring | Considering — no commitment yet |
-| ❌ Dropped | Decided not to build (with reason in issues) |
+| Symbol         | Meaning                                      |
+|----------------|----------------------------------------------|
+| ✅ Done         | Shipped and available                        |
+| 🚧 In Progress | Actively being worked on                     |
+| 🔲 Planned     | On the roadmap, not yet started              |
+| 🔍 Exploring   | Considering — no commitment yet              |
+| ❌ Dropped      | Decided not to build (with reason in issues) |
 
 ---
 

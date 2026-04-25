@@ -49,12 +49,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 
 ## Versioning Guide
 
-| Version | Meaning |
-|---------|---------|
-| `0.x.x` | Pre-release / MVP phase — API and features may change |
+| Version | Meaning                                                                               |
+|---------|---------------------------------------------------------------------------------------|
+| `0.x.x` | Pre-release / MVP phase — API and features may change                                 |
 | `1.0.0` | Stable release — core visualization, benchmarking, and complexity detection finalized |
-| `1.x.0` | New algorithm support, UI improvements |
-| `2.0.0` | AI integration layer, multi-language support |
+| `1.x.0` | New algorithm support, UI improvements                                                |
+| `2.0.0` | AI integration layer, multi-language support                                          |
 
 ---
 

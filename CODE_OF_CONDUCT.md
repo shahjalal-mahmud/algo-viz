@@ -51,11 +51,11 @@ All reports will be handled confidentially. We will review every report and resp
 
 Maintainers will investigate and may take one or more of the following actions, depending on the severity:
 
-| Severity | Action |
-|----------|--------|
+| Severity              | Action                           |
+|-----------------------|----------------------------------|
 | Minor / first offense | Private warning with explanation |
-| Repeated or moderate | Temporary ban from the project |
-| Severe or sustained | Permanent ban |
+| Repeated or moderate  | Temporary ban from the project   |
+| Severe or sustained   | Permanent ban                    |
 
 We will not name reporters publicly without consent.
 
