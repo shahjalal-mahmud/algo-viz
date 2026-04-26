@@ -1,9 +1,9 @@
 {
-  "name": "algo-visualizer",
+  "name": "algoviz",
   "displayName": "Algorithm Visualizer",
-  "description": "Run -> See -> Understand: Visualize algorithms step-by-step inside VS Code",
-  "version": "0.3.0",
-  "engines": { "vscode": "^1.85.0" },
+  "description": "Benchmark, analyze complexity, and get AI explanations for any Python or C++ DSA / LeetCode solution.",
+  "version": "5.0.0",
+  "engines": { "vscode": "^1.80.0" },
   "categories": ["Education", "Visualization"],
   "activationEvents": [],
   "main": "./out/extension.js",
@@ -11,16 +11,15 @@
     "commands": [
       {
         "command": "algoViz.visualize",
-        "title": "Visualize Algorithm",
-        "category": "AlgoViz",
-        "icon": "$(play)"
+        "title": "AlgoViz: Visualize Algorithm",
+        "icon": "$(graph)"
       }
     ],
     "menus": {
       "editor/title": [
         {
           "command": "algoViz.visualize",
-          "when": "editorLangId == python",
+          "when": "resourceExtname == .py || resourceExtname == .cpp",
           "group": "navigation"
         }
       ]
@@ -31,25 +30,23 @@
         "algoViz.aiApiKey": {
           "type": "string",
           "default": "",
-          "markdownDescription": "API key for AI analysis. Get a free key at [DeepSeek Platform](https://platform.deepseek.com) or [OpenRouter](https://openrouter.ai). **Never commit this value** — keep it in user settings, not workspace settings.",
+          "description": "API key for AI analysis (DeepSeek or OpenRouter). Store in User Settings — not workspace — to keep it private.",
           "scope": "application"
         },
         "algoViz.aiProvider": {
           "type": "string",
+          "default": "deepseek",
           "enum": ["deepseek", "openrouter"],
           "enumDescriptions": [
-            "DeepSeek API (api.deepseek.com) — recommended, very affordable",
-            "OpenRouter (openrouter.ai) — routes to many models, has free tier"
+            "Uses api.deepseek.com — great value, fast.",
+            "OpenRouter — access to many models including GPT-4o, Claude, etc."
           ],
-          "default": "deepseek",
-          "description": "Which AI provider to use for algorithm analysis.",
-          "scope": "window"
+          "description": "AI provider for analysis."
         },
         "algoViz.aiModel": {
           "type": "string",
           "default": "",
-          "description": "Model override. Leave empty to use the provider default (deepseek-chat / deepseek/deepseek-chat).",
-          "scope": "window"
+          "description": "Model override. Leave blank to use the provider default (deepseek-chat / deepseek/deepseek-chat)."
         }
       }
     }
@@ -57,13 +54,11 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile",
-    "lint": "eslint src --ext ts"
+    "watch": "tsc -watch -p ./"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "@types/vscode": "^1.85.0",
-    "typescript": "^5.3.0"
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.0.0"
   }
 }

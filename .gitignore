@@ -11,3 +11,4 @@ steps.json
 performance.json
 .vscode/
 .DS_Store
+.idea/
